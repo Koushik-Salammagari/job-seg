@@ -32,4 +32,4 @@ jobs:
 
       - name: 🚀 Run ReAct Agent script
         run: |
-          python src/react_agent/graph.py
+          PYTHONPATH=src python src/react_agent/graph.py
