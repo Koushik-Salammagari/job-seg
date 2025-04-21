@@ -1,0 +1,7 @@
+
+.qodo
+# Ignore secret JSONs and base64 versions
+src/react_agent/token*.json
+src/react_agent/credentials.json
+*.b64
+.DS_Store
