@@ -142,17 +142,17 @@ graph = builder.compile(
     interrupt_after=[],  # Add node names here to update state after they're called
 )
 graph.name = "ReAct Agent"  # This customizes the name in LangSmith
-if __name__ == "__main__":
-    prompt = (
-        "Check my recent emails and update my job applications sheet with any confirmations found — "
-        "include company name, role, and date applied."
-    )
+# if __name__ == "__main__":
+#     prompt = (
+#         "Check my recent emails and update my job applications sheet with any confirmations found — "
+#         "include company name, role, and date applied."
+#     )
 
-    print("\n🚀 Running ReAct agent with prompt:\n", prompt)
+#     print("\n🚀 Running ReAct agent with prompt:\n", prompt)
 
-    result = asyncio.run(
-        graph.ainvoke(InputState(input=prompt))
-    )
+#     result = asyncio.run(
+#         graph.ainvoke(InputState(input=prompt))
+#     )
 
-    print("\n✅ Final result:")
-    print(result["messages"][-1].content)
+#     print("\n✅ Final result:")
+#     print(result["messages"][-1].content)
