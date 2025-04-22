@@ -106,6 +106,8 @@ async def call_model(
             ),
         )
         logger.debug("Model response received: %s", response)
+        # Log tool calls in the call_model function
+        logger.debug("Tool calls in response: %s", response.tool_calls)
     except Exception as e:
         logger.error("Error during model invocation: %s", e)
         raise
