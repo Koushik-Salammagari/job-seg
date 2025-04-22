@@ -25,20 +25,30 @@ import os
 import base64
 
 def load_json_secret(env_var: str, output_path: str):
+    # print the current woerking directory
+    print("Current working directory:", os.getcwd())
+    print(f"Attempting to load environment variable: {env_var}")
     value = os.getenv(env_var)
     if not value:
+        print(f"Error: {env_var} not found in environment.")
         raise ValueError(f"{env_var} not found in environment.")
     try:
+        print(f"Decoding value for {env_var}")
         decoded = base64.b64decode(value).decode("utf-8")
-    except Exception:
+    except Exception as e:
+        print(f"Decoding failed for {env_var}, using fallback. Error: {e}")
         decoded = value  # fallback if it's plain text
+    print(f"Writing decoded value to {output_path}")
     with open(output_path, "w") as f:
         f.write(decoded)
+    print(f"Successfully wrote {env_var} to {output_path}")
 
-# Load secrets into files before any tools are called
+# Original relative paths (commented out)
 load_json_secret("GMAIL_TOKEN_JSON", "src/react_agent/token_gmail.json")
 load_json_secret("SHEETS_TOKEN_JSON", "src/react_agent/token.json")
 load_json_secret("GOOGLE_CREDENTIALS", "src/react_agent/credentials.json")
+
+
 
 async def call_model(
     state: State, config: RunnableConfig
@@ -141,18 +151,22 @@ graph = builder.compile(
     interrupt_before=[],  # Add node names here to update state before they're called
     interrupt_after=[],  # Add node names here to update state after they're called
 )
-graph.name = "ReAct Agent"  # This customizes the name in LangSmith
-# if __name__ == "__main__":
-#     prompt = (
-#         "Check my recent emails and update my job applications sheet with any confirmations found — "
-#         "include company name, role, and date applied."
-#     )
+graph.name = "ReAct Agent"  # This customizes the name in LangSmit
 
-#     print("\n🚀 Running ReAct agent with prompt:\n", prompt)
 
-#     result = asyncio.run(
-#         graph.ainvoke(InputState(input=prompt))
-#     )
 
-#     print("\n✅ Final result:")
-#     print(result["messages"][-1].content)
+# Run the graph - example usage by running the call_model function
+# Run the call_model function using asyncio
+if __name__ == "__main__":
+    # Initialize the state with the first user message
+    initial_state = State(messages=[
+        AIMessage(role="user", content="Look at my 5 latest emails and check if there are any job application confirmations. "
+                                       "If there are, extract the details like company name, role, and date applied. "
+                                       "Then, fill in those details in the Google Sheet I created — specifically in the cells "
+                                       "under the respective columns: Company name, Role, and Date applied.")
+    ])
+    
+    # Run the call_model function with the initialized state
+    asyncio.run(call_model(initial_state, RunnableConfig()))
+
+

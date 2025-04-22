@@ -19,6 +19,7 @@ class Configuration:
         metadata={
             "description": "The system prompt to use for the agent's interactions. "
             "This prompt sets the context and behavior for the agent."
+
         },
     )
 
