@@ -32,6 +32,12 @@ from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 # If modifying these SCOPES, delete the file token.pickle or token.json
 SCOPES_SHEETS = ['https://www.googleapis.com/auth/spreadsheets']
 
@@ -74,6 +80,7 @@ def get_gmail_service():
     Returns:
         googleapiclient.discovery.Resource: The authenticated Gmail API service.
     """
+    logger.debug("Initializing Gmail service.")
     creds = None
     token_path = 'src/react_agent/token_gmail.json'
     credentials_path = 'src/react_agent/credentials.json'
@@ -98,6 +105,7 @@ def get_gmail_service():
                     raise Exception("Unable to read input. Ensure the program is running in an interactive environment or provide the authorization code programmatically.")
         with open(token_path, 'w') as token:
             token.write(creds.to_json())
+    logger.debug("Gmail service initialized successfully.")
     return build('gmail', 'v1', credentials=creds)
 
 def extract_body(msg_data):
@@ -162,13 +170,15 @@ def read_emails():
     Returns:
         str: The body of the latest email message.
     """
+    logger.debug("Starting to read emails.")
     try:
         service = get_gmail_service()
         results = service.users().messages().list(userId='me', maxResults=5).execute()
         messages = results.get('messages', [])
 
         if not messages:
-            raise Exception("No messages found.")
+            logger.warning("No messages found.")
+            return []
         
         bodies = []
         
@@ -178,8 +188,7 @@ def read_emails():
             if body:
                 bodies.append(body)
 
-            
-
+        logger.debug("Successfully read emails: %s", bodies)
         return bodies
 
     except EOFError:
@@ -187,6 +196,7 @@ def read_emails():
     except FileNotFoundError as e:
         raise FileNotFoundError(f"Error: {e}. Ensure 'token.json' and 'credentials.json' are present in the correct directory.")
     except Exception as e:
+        logger.error("Error reading emails: %s", e)
         raise Exception(f"An unexpected error occurred: {e}")
 
 def get_sheets_service():
@@ -235,6 +245,7 @@ def add_data_to_sheet(values: list):
     Returns:
         None
     """
+    logger.debug("Adding data to Google Sheet: %s", values)
     # Ensure the function signature matches the docstring
     service = get_sheets_service()
     body = {
@@ -247,6 +258,7 @@ def add_data_to_sheet(values: list):
         insertDataOption='INSERT_ROWS',
         body=body
     ).execute()
+    logger.debug("Data added to Google Sheet successfully.")
     print(f"{result.get('updates', {}).get('updatedCells', 0)} cells updated.")
 
 # Example usage
