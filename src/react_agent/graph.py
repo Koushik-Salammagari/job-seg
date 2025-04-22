@@ -50,6 +50,15 @@ def load_json_secret(env_var: str, output_path: str):
 load_json_secret('GMAIL_TOKEN_JSON', 'token_gmail.json')
 load_json_secret('SHEETS_TOKEN_JSON', 'token.json')
 load_json_secret('GOOGLE_CREDENTIALS', 'credentials.json')
+# load anthropic key from the .env file
+anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+if not anthropic_key:
+    raise ValueError("ANTHROPIC_API_KEY not found in environment.")
+# Set the environment variable for the API key
+os.environ["ANTHROPIC_API_KEY"] = anthropic_key
+# Check if the key is set correctly
+if os.environ["ANTHROPIC_API_KEY"] != anthropic_key:
+    raise ValueError("Failed to set ANTHROPIC_API_KEY in environment.")
 
 
 
