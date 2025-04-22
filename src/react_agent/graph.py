@@ -44,9 +44,9 @@ def load_json_secret(env_var: str, output_path: str):
     print(f"Successfully wrote {env_var} to {output_path}")
 
 # Original relative paths (commented out)
-load_json_secret("GMAIL_TOKEN_JSON", "src/react_agent/token_gmail.json")
-load_json_secret("SHEETS_TOKEN_JSON", "src/react_agent/token.json")
-load_json_secret("GOOGLE_CREDENTIALS", "src/react_agent/credentials.json")
+# load_json_secret("GMAIL_TOKEN_JSON", "src/react_agent/token_gmail.json")
+# load_json_secret("SHEETS_TOKEN_JSON", "src/react_agent/token.json")
+# load_json_secret("GOOGLE_CREDENTIALS", "src/react_agent/credentials.json")
 
 
 
