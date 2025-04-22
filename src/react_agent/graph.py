@@ -2,6 +2,7 @@
 
 Works with a chat model with tool calling support.
 """
+import asyncio
 
 from datetime import datetime, timezone
 from typing import Dict, List, Literal, cast
