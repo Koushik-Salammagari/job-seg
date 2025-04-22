@@ -15,6 +15,8 @@ from react_agent.configuration import Configuration
 from react_agent.state import InputState, State
 from react_agent.tools import TOOLS
 from react_agent.utils import load_chat_model
+from dotenv import load_dotenv
+load_dotenv()
 
 # Define the function that calls the model
 
