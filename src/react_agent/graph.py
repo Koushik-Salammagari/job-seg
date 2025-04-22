@@ -3,6 +3,7 @@
 Works with a chat model with tool calling support.
 """
 import asyncio
+import logging
 
 from datetime import datetime, timezone
 from typing import Dict, List, Literal, cast
@@ -18,6 +19,10 @@ from react_agent.tools import TOOLS
 from react_agent.utils import load_chat_model
 from dotenv import load_dotenv
 load_dotenv()
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Define the function that calls the model
 
@@ -78,26 +83,36 @@ async def call_model(
     Returns:
         dict: A dictionary containing the model's response message.
     """
+    logger.debug("Starting call_model with state: %s", state)
     configuration = Configuration.from_runnable_config(config)
 
     # Initialize the model with tool binding. Change the model or add more tools here.
+    logger.debug("Loading chat model with configuration: %s", configuration)
     model = load_chat_model(configuration.model).bind_tools(TOOLS)
 
     # Format the system prompt. Customize this to change the agent's behavior.
     system_message = configuration.system_prompt.format(
         system_time=datetime.now(tz=timezone.utc).isoformat()
     )
+    logger.debug("Formatted system message: %s", system_message)
 
     # Get the model's response
-    response = cast(
-        AIMessage,
-        await model.ainvoke(
-            [{"role": "system", "content": system_message}, *state.messages], config
-        ),
-    )
+    try:
+        logger.debug("Invoking model with messages: %s", state.messages)
+        response = cast(
+            AIMessage,
+            await model.ainvoke(
+                [{"role": "system", "content": system_message}, *state.messages], config
+            ),
+        )
+        logger.debug("Model response received: %s", response)
+    except Exception as e:
+        logger.error("Error during model invocation: %s", e)
+        raise
 
     # Handle the case when it's the last step and the model still wants to use a tool
     if state.is_last_step and response.tool_calls:
+        logger.warning("Last step reached but model still wants to use a tool.")
         return {
             "messages": [
                 AIMessage(
@@ -108,6 +123,7 @@ async def call_model(
         }
 
     # Return the model's response as a list to be added to existing messages
+    logger.debug("Returning model response.")
     return {"messages": [response]}
 
 
